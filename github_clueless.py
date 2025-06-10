@@ -222,7 +222,8 @@ def main():
         # Verification
         total_calculated_change = sum([item[1] for item in waterfall_data[1:-1]])
         # Changed this from taxes, to overall change from all reforms!! Must change title accordingly
-        actual_change = household['Total Change in Net Income']
+        # And negated the change in income so it would match the change in taxes
+        actual_change = -household['Total Change in Net Income']
 
         # Check if calculated change is within $3 of other Tax Change calculation
         if abs(total_calculated_change - actual_change) < 3:
