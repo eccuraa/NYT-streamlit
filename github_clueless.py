@@ -169,7 +169,7 @@ def main():
                 """, unsafe_allow_html=True)
                 
         # Waterfall Chart
-        st.subheader("📊 Tax Impact Waterfall Chart")
+        st.subheader("📊 Financial Impact Waterfall Chart")
         
         # Prepare data for waterfall chart
         baseline_tax = household['Baseline Federal Tax Liability']
