@@ -169,49 +169,55 @@ def main():
                 """, unsafe_allow_html=True)
                 
         # Waterfall Chart
-        st.subheader("📊 Net Income Change Waterfall Chart")
-
+        st.subheader("📊 Tax Impact Waterfall Chart")
+        
         # Prepare data for waterfall chart
-        categories = ["Starting Net Income"]
-        values = [household['Baseline Net Income']]
-        measures = ["absolute"]
+        baseline_tax = household['Baseline Federal Tax Liability']
         
-        # Add each reform component
-        for name, _, income_change in active_components:
-            categories.append(name)
-            values.append(income_change)
-            measures.append("relative")
+        # Get tax liability changes (not net income changes)
+        waterfall_data = []
+        waterfall_data.append(("Baseline Tax", baseline_tax, baseline_tax))
         
-        # Add final total
-        categories.append("Final Net Income")
-        values.append(household['Baseline Net Income'] + household['Total Change in Net Income'])
-        measures.append("total")
+        running_total = baseline_tax
+        
+        for name, tax_after, income_change in active_components:
+            # Calculate the tax change (negative income change = positive tax change)
+            tax_change = -income_change
+            running_total += tax_change
+            waterfall_data.append((name, tax_change, running_total))
+        
+        # Final total
+        final_tax = baseline_tax + household['Total Change in Federal Tax Liability']
+        waterfall_data.append(("Final Tax", final_tax, final_tax))
         
         # Create waterfall chart
-        fig = go.Figure(go.Waterfall(
-            name="Net Income Impact",
+        fig = go.Figure()
+        
+        # Add baseline
+        fig.add_trace(go.Waterfall(
+            name="Tax Impact",
             orientation="v",
-            measure=measures,
-            x=categories,
+            measure=["absolute"] + ["relative"] * len(active_components) + ["total"],
+            x=[item[0] for item in waterfall_data],
+            y=[item[1] for item in waterfall_data],
+            text=[f"${item[1]:,.0f}" for item in waterfall_data],
             textposition="outside",
-            text=[f"${v:,.2f}" if abs(v) > 0.01 else "" for v in values],
-            y=values,
-            connector={"line": {"color": "rgb(63, 63, 63)"}},
-            increasing={"marker": {"color": "green"}},
-            decreasing={"marker": {"color": "red"}},
-            totals={"marker": {"color": "blue"}}
+            connector={"line":{"color":"rgb(63, 63, 63)"}},
+            increasing={"marker":{"color":"red"}},  # Tax increases in red
+            decreasing={"marker":{"color":"green"}},  # Tax decreases in green
+            totals={"marker":{"color":"blue"}}
         ))
         
         fig.update_layout(
-            title="How HR1 Components Affect This Household's Net Income",
+            title=f"Tax Liability Changes: ${baseline_tax:,.0f} → ${final_tax:,.0f}",
             xaxis_title="Reform Components",
-            yaxis_title="Net Income ($)",
+            yaxis_title="Tax Liability ($)",
             showlegend=False,
             height=500,
-            xaxis={'tickangle': 45}
+            xaxis={'tickangle': -45}
         )
         
-        st.plotly_chart(fig, use_container_width=True)   
+        st.plotly_chart(fig, use_container_width=True)
         
         # Verification
         total_calculated_change = sum([item[1] for item in waterfall_data[1:-1]])
