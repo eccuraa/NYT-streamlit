@@ -113,7 +113,7 @@ def main():
                 st.markdown(f"**Property Taxes:** ${household['Property Taxes']:,.2f}")
             if household['State Income Tax'] > 0:
                 st.markdown(f"**State Income Tax:** ${household['State Income Tax']:,.2f}")
-             if household['Capital Gains'] > 0:
+            if household['Capital Gains'] > 0:
                 st.markdown(f"**State Income Tax:** ${household['Capital Gains']:,.2f}")           
     
     with col2:
