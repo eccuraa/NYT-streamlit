@@ -227,7 +227,7 @@ def main():
             yaxis_title="Tax Liability ($)",
             showlegend=False,
             height=500,
-            xaxis={'tickangle': -45}
+            xaxis={'tickangle': -45},
             yaxis={
                 'range': [
                     min(0, min([item[1] for item in waterfall_data]) * 1.2),
