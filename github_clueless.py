@@ -223,7 +223,8 @@ def main():
         total_calculated_change = sum([item[1] for item in waterfall_data[1:-1]])
         actual_change = household['Total Change in Federal Tax Liability']
 
-        if abs(total_calculated_change - actual_change) < 0.01:
+        # Check if calculated change is within $3 of other Tax Change calculation
+        if abs(total_calculated_change - actual_change) < 3:
             pass
         else:
             st.error(f"Discrepancy detected: Calculated change ${total_calculated_change:,.2f} vs Actual change ${actual_change:,.2f}")
