@@ -12,7 +12,7 @@ st.set_page_config(
 # Load data
 @st.cache_data
 def load_data():
-    return pd.read_csv("Household Tax Income Changes.csv")
+    return pd.read_csv("household_tax_income_changes.csv")
 
 # Main app
 def main():
@@ -57,10 +57,14 @@ def main():
     st.sidebar.markdown(f"""
     **State:** {household['State']}  
     **Head of Household Age:** {household['Age of Head']:.0f} years  
-    **Number of Dependents:** {household['Number of Dependents']:.0f}  
-    **Marital Status:** {'Married' if household['Is Married'] else 'Single'}""")
+    **Number of Dependents:** {household['Number of Dependents']:.0f}""")
+    
     if household['Is Married']:
-        st.sidebar.markdown(f"**Spouse Age:** {household['Age of Spouse']:.0f} years")
+        st.sidebar.markdown(f"""
+        **Marital Status:** {'Married'}
+        **Spouse Age:** {household['Age of Spouse']:.0f} years")""")
+    else:
+        st.sidebar.markdown("**Marital Status:** Single")
 
     st.sidebar.markdown("**Income Sources:**")
     income_sources = [
