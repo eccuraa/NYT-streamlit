@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import math
+import plotly.graph_objects as go
 
 # Page configuration
 st.set_page_config(
@@ -53,7 +55,7 @@ def main():
     household = df[df['Household ID'] == household_id].iloc[0]
 
     # Baseline Attributes in Sidebar
-    st.sidebar.subheader("📊 Baseline Household Attributes")
+    st.sidebar.subheader("Baseline Household Attributes")
     st.sidebar.markdown(f"""
     **State:** {household['State']}  
     **Head of Household Age:** {household['Age of Head']:.0f} years  
@@ -128,7 +130,7 @@ def main():
         st.subheader("📈 Statistical Weight")
         with st.container():
             weight = household['Household Weight']
-            st.metric("Population Weight", f"{weight:,.0f}")
+            st.metric("Population Weight", f"{math.ceil(weight):,}")
             st.caption("This household represents approximately this many similar households in the U.S.")
     
     # Detailed Reform Breakdown
@@ -165,6 +167,65 @@ def main():
                 </p>
                 </div>
                 """, unsafe_allow_html=True)
+                
+        # Waterfall Chart
+        st.subheader("📊 Tax Impact Waterfall Chart")
+        
+        # Prepare data for waterfall chart
+        baseline_tax = household['Baseline Federal Tax Liability']
+        
+        # Get tax liability changes (not net income changes)
+        waterfall_data = []
+        waterfall_data.append(("Baseline Tax", baseline_tax, baseline_tax))
+        
+        running_total = baseline_tax
+        
+        for name, tax_after, income_change in active_components:
+            # Calculate the tax change (negative income change = positive tax change)
+            tax_change = -income_change
+            running_total += tax_change
+            waterfall_data.append((name, tax_change, running_total))
+        
+        # Final total
+        final_tax = baseline_tax + household['Total Change in Federal Tax Liability']
+        waterfall_data.append(("Final Tax", final_tax, final_tax))
+        
+        # Create waterfall chart
+        fig = go.Figure()
+        
+        # Add baseline
+        fig.add_trace(go.Waterfall(
+            name="Tax Impact",
+            orientation="v",
+            measure=["absolute"] + ["relative"] * len(active_components) + ["total"],
+            x=[item[0] for item in waterfall_data],
+            y=[item[1] for item in waterfall_data],
+            text=[f"${item[1]:,.0f}" for item in waterfall_data],
+            textposition="outside",
+            connector={"line":{"color":"rgb(63, 63, 63)"}},
+            increasing={"marker":{"color":"red"}},  # Tax increases in red
+            decreasing={"marker":{"color":"green"}},  # Tax decreases in green
+            totals={"marker":{"color":"blue"}}
+        ))
+        
+        fig.update_layout(
+            title=f"Tax Liability Changes: ${baseline_tax:,.0f} → ${final_tax:,.0f}",
+            xaxis_title="Reform Components",
+            yaxis_title="Tax Liability ($)",
+            showlegend=False,
+            height=500,
+            xaxis={'tickangle': -45}
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Verification
+        total_calculated_change = sum([item[1] for item in waterfall_data[1:-1]])
+        actual_change = household['Total Change in Federal Tax Liability']
+        
+        st.caption(f"Verification: Components sum to ${total_calculated_change:,.2f}, "
+                f"Total change: ${actual_change:,.2f}")
+
     else:
         st.info("This household is not significantly affected by any specific reform components.")
     
