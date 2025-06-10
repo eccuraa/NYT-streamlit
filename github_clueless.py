@@ -97,7 +97,7 @@ def main():
     
     with col1:
         # Baseline Calculated Values Card
-        st.subheader("💰 Baseline Federal Tax and Net Income")
+        st.subheader("Baseline Federal Tax and Net Income")
         with st.container():
             st.metric(
                 "Federal Tax Liability", 
