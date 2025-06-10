@@ -61,7 +61,7 @@ def main():
     
     if household['Is Married']:
         st.sidebar.markdown(f"""
-        **Marital Status:** {'Married'}
+        **Marital Status:** {'Married'}\f
         **Spouse Age:** {household['Age of Spouse']:.0f} years")""")
     else:
         st.sidebar.markdown("**Marital Status:** Single")
