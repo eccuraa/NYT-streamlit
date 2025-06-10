@@ -222,9 +222,11 @@ def main():
         # Verification
         total_calculated_change = sum([item[1] for item in waterfall_data[1:-1]])
         actual_change = household['Total Change in Federal Tax Liability']
-        
-        st.caption(f"Verification: Components sum to ${total_calculated_change:,.2f}, "
-                f"Total change: ${actual_change:,.2f}")
+
+        if abs(total_calculated_change - actual_change) < 0.01:
+            pass
+        else:
+            st.error(f"Discrepancy detected: Calculated change ${total_calculated_change:,.2f} vs Actual change ${actual_change:,.2f}")
 
     else:
         st.info("This household is not significantly affected by any specific reform components.")
