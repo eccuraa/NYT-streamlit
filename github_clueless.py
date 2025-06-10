@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import math
 import plotly.graph_objects as go
+import random
 
 # Page configuration
 st.set_page_config(
@@ -30,7 +31,7 @@ def main():
     # Option to select by household ID or find interesting cases
     selection_method = st.sidebar.radio(
         "Selection Method:",
-        ["By Household ID", "Find Interesting Cases"]
+        ["Random Shuffle", "By Household ID", "Find Interesting Cases"]
     )
     
     if selection_method == "By Household ID":
@@ -38,6 +39,18 @@ def main():
             "Choose Household ID:",
             df['Household ID'].unique()
         )
+    
+    elif selection_method == "Random Shuffle":
+        if st.sidebar.button("🎲 Get Random Household"):
+            # Store random selection in session state to persist across reruns
+            st.session_state.random_household = df['Household ID'].sample(1).iloc[0]
+        
+        # Show the selected random household or pick initial one
+        if 'random_household' not in st.session_state:
+            st.session_state.random_household = df['Household ID'].sample(1).iloc[0]
+        
+        household_id = st.session_state.random_household
+        st.sidebar.info(f"Random Household ID: {household_id}")
     else:
         # Pre-filter for interesting cases
         interesting_options = {
