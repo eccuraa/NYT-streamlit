@@ -96,7 +96,8 @@ def main():
         ("Employment Income", household['Employment Income']),
         ("Self-Employment Income", household['Self-Employment Income']),
         ("Tip Income", household['Tip Income']),
-        ("Overtime Income", household['Overtime Income'])
+        ("Overtime Income", household['Overtime Income']),
+        ("Capital Gains", household['Capital Gains'])
     ]
 
     for source, amount in income_sources:
