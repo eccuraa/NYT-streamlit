@@ -228,9 +228,17 @@ def main():
             showlegend=False,
             height=500,
             xaxis={'tickangle': -45}
+        '''
+            yaxis={
+                'range': [
+                    min(0, min([item[1] for item in waterfall_data]) * 1.2),
+                    max([item[1] for item in waterfall_data]) * 1.1
+                ]
+            }
         )
+        '''
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=False)
         
         # Verification
         total_calculated_change = sum([item[1] for item in waterfall_data[1:-1]])
