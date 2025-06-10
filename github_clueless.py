@@ -73,6 +73,17 @@ def main():
     **State:** {household['State']}  
     **Head of Household Age:** {household['Age of Head']:.0f} years  
     **Number of Dependents:** {household['Number of Dependents']:.0f}""")
+    # Add children's ages if there are dependents
+    if household['Number of Dependents'] > 0:
+        dependent_ages = []
+        for i in range(1, 12):  # Check dependents 1-11
+            age_col = f'Age of Dependent {i}'
+            if pd.notna(household[age_col]) and household[age_col] > 0:
+                dependent_ages.append(f"{household[age_col]:.0f}")
+        
+        if dependent_ages:
+            st.sidebar.markdown(f"**Children's Ages:** {', '.join(dependent_ages)} years")
+    
 
     if household['Is Married']:
         st.sidebar.markdown(f"""**Marital Status:** Married  
