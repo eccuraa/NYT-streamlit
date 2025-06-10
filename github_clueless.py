@@ -163,7 +163,7 @@ def main():
         ("SALT Reform", household['Federal tax liability after SALT Reform'], household['Net income change after SALT Reform']),
         ("Tip Income Exemption", household['Federal tax liability after Tip Income Exempt'], household['Net income change after Tip Income Exempt']),
         ("Overtime Income Exemption", household['Federal tax liability after Overtime Income Exempt'], household['Net income change after Overtime Income Exempt']),
-        ("Auto Loan Interest Deduction", household['Federal tax liability after Auto Loan Interest ALD'], household['Net income change after Auto Loan Interest ALD'])
+        ("Auto Loan Interest Deduction", household['Federal tax liability after Auto Loan Interest ALD'], household['Net income change after Auto Loan Interest ALD']),
         ("Miscellaneous Reform", household['Federal tax liability after Miscellaneous Reform'], household['Net income change after Miscellaneous Reform']),
         ("Other Itemized Deductions Reform", household['Federal tax liability after Other Itemized Deductions Reform'], household['Net income change after Other Itemized Deductions Reform']),
         ("Pease Reform", household['Federal tax liability after Pease Reform'], household['Net income change after Pease Reform'])
