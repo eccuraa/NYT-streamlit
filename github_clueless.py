@@ -58,11 +58,10 @@ def main():
     **State:** {household['State']}  
     **Head of Household Age:** {household['Age of Head']:.0f} years  
     **Number of Dependents:** {household['Number of Dependents']:.0f}""")
-    
+
     if household['Is Married']:
-        st.sidebar.markdown(f"""
-        **Marital Status:** {'Married'}\f
-        **Spouse Age:** {household['Age of Spouse']:.0f} years")""")
+        st.sidebar.markdown(f"""**Marital Status:** Married  
+    **Spouse Age:** {household['Age of Spouse']:.0f} years""")
     else:
         st.sidebar.markdown("**Marital Status:** Single")
 
