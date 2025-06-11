@@ -383,13 +383,16 @@ def main():
         st.subheader(f"📊 {chart_type} Impact Waterfall Chart")
         
         # Calculate baseline
-        baseline_federal = household['Baseline Federal Tax Liability'] if show_federal else 0
-        baseline_state = household.get('Baseline State Tax Liability', 0) if show_state else 0  # Add if column exists
-        baseline_total = baseline_federal + baseline_state
+        if show_federal & show_state:
+            baseline = household['Baseline Federal Tax Liability'] + household['Baseline State Tax Liability']
+        elif show_federal:
+            baseline = household['Baseline Federal Tax Liability']
+        elif show_state:
+            baseline = household['Baseline State Tax Liability']
         
         # Prepare waterfall data
-        waterfall_data = [(f"Baseline {chart_type}", baseline_total, baseline_total)]
-        running_total = baseline_total
+        waterfall_data = [(f"Baseline {chart_type}", baseline, baseline)]
+        running_total = baseline
         
         for name, combined_tax, income_change in active_components:
             tax_change = -income_change
@@ -397,7 +400,7 @@ def main():
             waterfall_data.append((name, tax_change, running_total))
         
         # Final total
-        final_total = baseline_total + total_tax_change
+        final_total = baseline + total_tax_change
         waterfall_data.append((f"Final {chart_type}", final_total, final_total))  
 
                 
