@@ -288,15 +288,27 @@ def main():
             state_tax_change = household['Total Change in State Tax Liability'] if show_state else 0
             total_tax_change = federal_tax_change + state_tax_change
             
-            # Update the tax change display
-            tax_color = "red" if total_tax_change > 0 else "green"
+            # Calculate percentage changes
+            federal_tax_pct_change = household['Percentage Change in Federal Tax Liability'] if show_federal else 0
+            state_tax_pct_change = household['Percentage Change in State Tax Liability'] if show_state else 0
             
-            # Update the markdown to use total_tax_change instead of tax_change
+            # For combined percentage, calculate weighted average or show separately
+            if show_federal and show_state:
+                tax_display = f"Federal: ${federal_tax_change:,.2f} ({federal_tax_pct_change:+.1f}%), State: ${state_tax_change:,.2f} ({state_tax_pct_change:+.1f}%)"
+            elif show_federal:
+                tax_display = f"${federal_tax_change:,.2f} ({federal_tax_pct_change:+.1f}%)"
+            else:  # show_state
+                tax_display = f"${state_tax_change:,.2f} ({state_tax_pct_change:+.1f}%)"
+            
+            # Color coding for positive/negative changes
+            tax_color = "red" if total_tax_change > 0 else "green"
+            income_color = "green" if income_change > 0 else "red"  # Fixed: Define income_color
+            
             st.markdown(f"""
             <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
             <h4>Overall Impact</h4>
             <p style="color: {tax_color}; font-size: 18px; font-weight: bold;">
-            Tax Change: ${total_tax_change:,.2f}
+            Tax Change: {tax_display}
             </p>
             <p style="color: {income_color}; font-size: 18px; font-weight: bold;">
             Net Income Change: ${income_change:,.2f} ({income_pct_change:+.1f}%)
