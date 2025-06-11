@@ -280,9 +280,12 @@ def main():
       
     
     with col2:
-        # Reform Impact Card
         st.subheader("🔄 HR1 Bill Impact Summary")
         with st.container():
+            # Define income variables first (these don't change based on tax selection)
+            income_change = household['Total Change in Net Income']
+            income_pct_change = household['Percentage Change in Net Income']
+            
             # Calculate tax changes based on selection
             federal_tax_change = household['Total Change in Federal Tax Liability'] if show_federal else 0
             state_tax_change = household['Total Change in State Tax Liability'] if show_state else 0
@@ -292,7 +295,7 @@ def main():
             federal_tax_pct_change = household['Percentage Change in Federal Tax Liability'] if show_federal else 0
             state_tax_pct_change = household['Percentage Change in State Tax Liability'] if show_state else 0
             
-            # For combined percentage, calculate weighted average or show separately
+            # For combined percentage, show separately when both selected
             if show_federal and show_state:
                 tax_display = f"Federal: ${federal_tax_change:,.2f} ({federal_tax_pct_change:+.1f}%), State: ${state_tax_change:,.2f} ({state_tax_pct_change:+.1f}%)"
             elif show_federal:
@@ -302,7 +305,7 @@ def main():
             
             # Color coding for positive/negative changes
             tax_color = "red" if total_tax_change > 0 else "green"
-            income_color = "green" if income_change > 0 else "red"  # Fixed: Define income_color
+            income_color = "green" if income_change > 0 else "red"
             
             st.markdown(f"""
             <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
