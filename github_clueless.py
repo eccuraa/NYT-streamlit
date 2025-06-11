@@ -211,7 +211,7 @@ def main():
         
         # Get tax liability changes (not net income changes)
         waterfall_data = []
-        waterfall_data.append(("Baseline Tax", baseline_tax, baseline_tax))
+        waterfall_data.append(("Baseline Federal Income Tax", baseline_tax, baseline_tax))
         
         running_total = baseline_tax
         
@@ -223,14 +223,14 @@ def main():
         
         # Final total
         final_tax = baseline_tax + household['Total Change in Federal Tax Liability']
-        waterfall_data.append(("Final Tax", final_tax, final_tax))
+        waterfall_data.append(("Final Federal Income Tax", final_tax, final_tax))
         
-        # Create waterfall chart
-        fig = go.Figure()
+        # Create FEDERAL INCOME TAX waterfall chart (state option still needed, etc.)
+        fig = go.Figure() 
         
         # Add baseline
         fig.add_trace(go.Waterfall(
-            name="Tax Impact",
+            name="Federal Income Tax Impact",
             orientation="v",
             measure=["absolute"] + ["relative"] * len(active_components) + ["total"],
             x=[item[0] for item in waterfall_data],
@@ -244,7 +244,7 @@ def main():
         ))
         
         fig.update_layout(
-            title=f"Tax Liability Changes: ${baseline_tax:,.0f} → ${final_tax:,.0f}",
+            title=f"Federal Income Tax Liability Changes: ${baseline_tax:,.0f} → ${final_tax:,.0f}",
             xaxis_title="Reform Components",
             yaxis_title="Tax Liability ($)",
             showlegend=False,
