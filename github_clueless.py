@@ -287,8 +287,7 @@ def main():
     
     st.info(f"""
     **Quick Story Angle:** This {household['State']} household (ID: {household_id}) {impact_level} {direction} the HR1 bill, 
-    with a net income change of ${household['Total Change in Net Income']:,.2f} ({income_pct_change:+.1f}%).
-    {biggest_reform_text}
+    with a net income change of ${household['Total Change in Net Income']:,.2f} ({income_pct_change:+.1f}%). The biggest driver is {biggest_reform_name} (${biggest_reform_change:+,.2f}).
     The household represents approximately {f"{math.ceil(weight):,}"} similar American families.
     """)
     
