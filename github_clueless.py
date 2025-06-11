@@ -371,35 +371,42 @@ def main():
                 </p>
                 </div>
                 """, unsafe_allow_html=True)
-                
+    
+
+        
         # Waterfall Chart
-        st.subheader("📊 Financial Impact Waterfall Chart")
+        chart_title = []
+        if show_federal: chart_title.append("Federal")
+        if show_state: chart_title.append("State")
+        chart_type = " & ".join(chart_title) + " Tax"
         
-        # Prepare data for waterfall chart
-        baseline_tax = household['Baseline Federal Tax Liability']
+        st.subheader(f"📊 {chart_type} Impact Waterfall Chart")
         
-        # Get tax liability changes (not net income changes)
-        waterfall_data = []
-        waterfall_data.append(("Baseline Federal Income Tax", baseline_tax, baseline_tax))
+        # Calculate baseline
+        baseline_federal = household['Baseline Federal Tax Liability'] if show_federal else 0
+        baseline_state = household.get('Baseline State Tax Liability', 0) if show_state else 0  # Add if column exists
+        baseline_total = baseline_federal + baseline_state
         
-        running_total = baseline_tax
+        # Prepare waterfall data
+        waterfall_data = [(f"Baseline {chart_type}", baseline_total, baseline_total)]
+        running_total = baseline_total
         
-        for name, tax_after, income_change in active_components:
-            # Calculate the tax change (negative income change = positive tax change)
+        for name, combined_tax, income_change in active_components:
             tax_change = -income_change
             running_total += tax_change
             waterfall_data.append((name, tax_change, running_total))
         
         # Final total
-        final_tax = baseline_tax + household['Total Change in Federal Tax Liability']
-        waterfall_data.append(("Final Federal Income Tax", final_tax, final_tax))
-        
+        final_total = baseline_total + total_tax_change
+        waterfall_data.append((f"Final {chart_type}", final_total, final_total))  
+
+                
         # Create FEDERAL INCOME TAX waterfall chart (state option still needed, etc.)
         fig = go.Figure() 
         
         # Add baseline
         fig.add_trace(go.Waterfall(
-            name="Federal Income Tax Impact",
+            name=f"{chart_type} Impact",  # Dynamic name based on selection
             orientation="v",
             measure=["absolute"] + ["relative"] * len(active_components) + ["total"],
             x=[item[0] for item in waterfall_data],
@@ -412,8 +419,9 @@ def main():
             totals={"marker":{"color":"blue"}}
         ))
         
+        # Update chart title
         fig.update_layout(
-            title=f"Federal Income Tax Liability Changes: ${baseline_tax:,.0f} → ${final_tax:,.0f}",
+            title=f"{chart_type} Liability Changes: ${baseline_total:,.0f} → ${final_total:,.0f}",
             xaxis_title="Reform Components",
             yaxis_title="Tax Liability ($)",
             showlegend=False,
