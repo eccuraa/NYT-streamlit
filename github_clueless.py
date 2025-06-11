@@ -82,6 +82,8 @@ def main():
         # Create ranked list for selection
         ranked_options = []
         for i, (idx, row) in enumerate(top_households.iterrows(), 1):
+            household_ids.append(row['Household ID'])  # Store the household ID
+            
             if "%" in case_type:
                 if "Tax" in case_type:
                     value = row['Percentage Change in Federal Tax Liability']
@@ -100,9 +102,9 @@ def main():
         # Let user select from ranked list
         selected_option = st.sidebar.selectbox(f"Top 20 for {case_type}:", ranked_options)
         
-        # Extract household ID from selection
-        household_id = int(selected_option.split("HH ")[1].split(" ")[0])
-        st.sidebar.info(f"Selected Household ID: {household_id}")
+        # Get household ID using the index
+        selected_index = ranked_options.index(selected_option)
+        household_id = household_ids[selected_index]
 
     
     
