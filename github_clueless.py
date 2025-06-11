@@ -47,7 +47,7 @@ def main():
         if min_weight > 0:
             df_filtered = df_filtered[df_filtered['Household Weight'] >= min_weight]
         
-        # Filter 2: Baseline Net Income
+        # Filter 2: Net Income
         income_ranges = {
             "All Income Levels": (0, float('inf')),
             "Under $25k": (0, 25000),
@@ -56,7 +56,7 @@ def main():
             "$100k - $200k": (100000, 200000),
             "$200k+": (200000, float('inf'))
         }
-        selected_income = st.selectbox("Baseline Net Income:", list(income_ranges.keys()))  # Removed .sidebar
+        selected_income = st.selectbox("Net Income:", list(income_ranges.keys()))  # Removed .sidebar
         min_income, max_income = income_ranges[selected_income]
         if min_income > 0 or max_income < float('inf'):
             df_filtered = df_filtered[
@@ -86,7 +86,7 @@ def main():
             else:
                 df_filtered = df_filtered[df_filtered['Number of Dependents'] == int(selected_dependents)]
 
-        # Filter 6: Age of Head
+        # Filter 6: Age of Head of Household
         age_ranges = {
             "All Ages": (0, 200),
             "Under 30": (0, 30),
@@ -97,7 +97,7 @@ def main():
             "70-80": (70, 80),
             "80+": (80, 200)
         }
-        selected_age = st.selectbox("Age of Head:", list(age_ranges.keys()))
+        selected_age = st.selectbox("Head of Household Age:", list(age_ranges.keys()))
         min_age, max_age = age_ranges[selected_age]
         if selected_age != "All Ages":
             df_filtered = df_filtered[
