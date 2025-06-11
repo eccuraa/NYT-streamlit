@@ -128,10 +128,11 @@ def main():
             )
             
             # Show other current expenses
+            if household['State Income Tax'] > 0:
+                st.markdown(f"**State Income Tax:** ${household['State Income Tax']:,.2f}")    
             if household['Property Taxes'] > 0:
                 st.markdown(f"**Property Taxes:** ${household['Property Taxes']:,.2f}")
-            if household['State Income Tax'] > 0:
-                st.markdown(f"**State Income Tax:** ${household['State Income Tax']:,.2f}")        
+      
     
     with col2:
         # Reform Impact Card
