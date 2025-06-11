@@ -28,26 +28,98 @@ def main():
     # Sidebar for household selection
     st.sidebar.header("Select Household")
     
-    # Option to select by household ID or find interesting cases
+    # Filters section
+    st.sidebar.subheader("🔍 Filters")
+    
+    # Initialize filtered dataframe
+    df_filtered = df.copy()
+
+    ### ALL FILTERS
+    
+    # Filter 1: Household Weight
+    weight_options = {
+        "All Households": 0,
+        "Weight 1,000+": 1000,
+        "Weight 5,000+": 5000,
+        "Weight 10,000+": 10000,
+        "Weight 25,000+": 25000,
+        "Weight 50,000+": 50000
+    }
+    selected_weight = st.sidebar.selectbox("Minimum Household Weight:", list(weight_options.keys()))
+    min_weight = weight_options[selected_weight]
+    if min_weight > 0:
+        df_filtered = df_filtered[df_filtered['Household Weight'] >= min_weight]
+    
+    # Filter 2: Baseline Net Income
+    income_ranges = {
+        "All Income Levels": (0, float('inf')),
+        "Under $25k": (0, 25000),
+        "$25k - $50k": (25000, 50000),
+        "$50k - $100k": (50000, 100000),
+        "$100k - $200k": (100000, 200000),
+        "$200k+": (200000, float('inf'))
+    }
+    selected_income = st.sidebar.selectbox("Baseline Net Income:", list(income_ranges.keys()))
+    min_income, max_income = income_ranges[selected_income]
+    if min_income > 0 or max_income < float('inf'):
+        df_filtered = df_filtered[
+            (df_filtered['Baseline Net Income'] >= min_income) & 
+            (df_filtered['Baseline Net Income'] <= max_income)
+        ]
+    
+    # Filter 3: State
+    states = ["All States"] + sorted(df['State'].unique().tolist())
+    selected_state = st.sidebar.selectbox("State:", states)
+    if selected_state != "All States":
+        df_filtered = df_filtered[df_filtered['State'] == selected_state]
+    
+    # Filter 4: Marital Status
+    marital_options = ["All", "Married", "Single"]
+    selected_marital = st.sidebar.selectbox("Marital Status:", marital_options)
+    if selected_marital != "All":
+        is_married = selected_marital == "Married"
+        df_filtered = df_filtered[df_filtered['Is Married'] == is_married]
+    
+    # Filter 5: Number of Dependents
+    dependent_options = ["All", "0", "1", "2", "3+"]
+    selected_dependents = st.sidebar.selectbox("Number of Dependents:", dependent_options)
+    if selected_dependents != "All":
+        if selected_dependents == "3+":
+            df_filtered = df_filtered[df_filtered['Number of Dependents'] >= 3]
+        else:
+            df_filtered = df_filtered[df_filtered['Number of Dependents'] == int(selected_dependents)]
+
+    ### CAN ADD MORE FILTERS HERE
+    
+    # Show filter results
+    st.sidebar.caption(f"📊 Showing {len(df_filtered):,} of {len(df):,} households")
+    if len(df_filtered) == 0:
+        st.sidebar.error("No households match your filters!")
+        st.stop()
+    
+    # Add separator
+    st.sidebar.markdown("---")
+    
+    # Use df_filtered everywhere below this point
     selection_method = st.sidebar.radio(
         "Selection Method:",
-        ["Random Shuffle", "By Household ID", "Find Interesting Cases"]
+        ["By Household ID", "Find Interesting Cases", "Random Shuffle"]
     )
     
     if selection_method == "By Household ID":
         household_id = st.sidebar.selectbox(
             "Choose Household ID:",
-            df['Household ID'].unique()
+            df_filtered['Household ID'].unique()
         )
     
     elif selection_method == "Random Shuffle":
         if st.sidebar.button("🎲 Get Random Household"):
             # Store random selection in session state to persist across reruns
-            st.session_state.random_household = df['Household ID'].sample(1).iloc[0]
+            st.session_state.random_household = df_filtered['Household ID'].sample(1).iloc[0]
         
         # Show the selected random household or pick initial one
         if 'random_household' not in st.session_state:
-            st.session_state.random_household = df['Household ID'].sample(1).iloc[0]
+            st.session_state.random_household = df_filtered['Household ID'].sample(1).iloc[0]
         
         household_id = st.session_state.random_household
         st.sidebar.info(f"Random Household ID: {household_id}")
@@ -77,7 +149,7 @@ def main():
         }
         
         method, column = categories[case_type]
-        top_households = getattr(df, method)(20, column)
+        top_households = getattr(df_filtered, method)(20, column)
                 
         # Create ranked list for selection
         ranked_options = []
