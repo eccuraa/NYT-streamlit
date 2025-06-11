@@ -283,26 +283,27 @@ def main():
         # Reform Impact Card
         st.subheader("🔄 HR1 Bill Impact Summary")
         with st.container():
-            tax_change = household['Total Change in Federal Tax Liability']
-            income_change = household['Total Change in Net Income']
-            tax_pct_change = household['Percentage Change in Federal Tax Liability']
-            income_pct_change = household['Percentage Change in Net Income']
+            # Calculate tax changes based on selection
+            federal_tax_change = household['Total Change in Federal Tax Liability'] if show_federal else 0
+            state_tax_change = household['Total Change in State Tax Liability'] if show_state else 0
+            total_tax_change = federal_tax_change + state_tax_change
             
-            # Color coding for positive/negative changes
-            tax_color = "red" if tax_change > 0 else "green"
-            income_color = "green" if income_change > 0 else "red"
+            # Update the tax change display
+            tax_color = "red" if total_tax_change > 0 else "green"
             
+            # Update the markdown to use total_tax_change instead of tax_change
             st.markdown(f"""
             <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
             <h4>Overall Impact</h4>
             <p style="color: {tax_color}; font-size: 18px; font-weight: bold;">
-            Tax Change: ${tax_change:,.2f} ({tax_pct_change:+.1f}%)
+            Tax Change: ${total_tax_change:,.2f}
             </p>
             <p style="color: {income_color}; font-size: 18px; font-weight: bold;">
             Net Income Change: ${income_change:,.2f} ({income_pct_change:+.1f}%)
             </p>
             </div>
             """, unsafe_allow_html=True)
+
         
         # Statistical Weight Card
         st.subheader("📈 Statistical Weight")
@@ -311,24 +312,30 @@ def main():
             st.metric("Population Weight", f"{math.ceil(weight):,}")
             st.caption("This household represents approximately this many similar households in the U.S.")
     
-    # Create reform components data
-    reform_components = [
-        ("Tax Rate Reform", household['Federal tax liability after Tax Rate Reform'], household['Net income change after Tax Rate Reform']),
-        ("Standard Deduction Reform", household['Federal tax liability after Standard Deduction Reform'], household['Net income change after Standard Deduction Reform']),
-        ("Exemption Reform", household['Federal tax liability after Exemption Reform'], household['Net income change after Exemption Reform']),
-        ("Child Tax Credit Reform", household['Federal tax liability after CTC Reform'], household['Net income change after CTC Reform']),
-        ("QBID Reform", household['Federal tax liability after QBID Reform'], household['Net income change after QBID Reform']),
-        # Removed Estate Tax Reform, because it doesn't directly affect Federal Income Tax, like the other reforms.
-        #("Estate Tax Reform", household['Federal tax liability after Estate Tax Reform'], household['Net income change after Estate Tax Reform']),
-        ("AMT Reform", household['Federal tax liability after AMT Reform'], household['Net income change after AMT Reform']),
-        ("SALT Reform", household['Federal tax liability after SALT Reform'], household['Net income change after SALT Reform']),
-        ("Tip Income Exemption", household['Federal tax liability after Tip Income Exempt'], household['Net income change after Tip Income Exempt']),
-        ("Overtime Income Exemption", household['Federal tax liability after Overtime Income Exempt'], household['Net income change after Overtime Income Exempt']),
-        ("Auto Loan Interest Deduction", household['Federal tax liability after Auto Loan Interest ALD'], household['Net income change after Auto Loan Interest ALD']),
-        ("Miscellaneous Reform", household['Federal tax liability after Miscellaneous Reform'], household['Net income change after Miscellaneous Reform']),
-        ("Other Itemized Deductions Reform", household['Federal tax liability after Other Itemized Deductions Reform'], household['Net income change after Other Itemized Deductions Reform']),
-        ("Pease Reform", household['Federal tax liability after Pease Reform'], household['Net income change after Pease Reform'])
+    # Create reform components data based on selection
+    reform_components = []
+    reform_configs = [
+        ("Tax Rate Reform", "Tax Rate Reform", "Net income change after Tax Rate Reform"),
+        ("Standard Deduction Reform", "Standard Deduction Reform", "Net income change after Standard Deduction Reform"),
+        ("Exemption Reform", "Exemption Reform", "Net income change after Exemption Reform"),
+        ("Child Tax Credit Reform", "CTC Reform", "Net income change after CTC Reform"),
+        ("QBID Reform", "QBID Reform", "Net income change after QBID Reform"),
+        ("AMT Reform", "AMT Reform", "Net income change after AMT Reform"),
+        ("SALT Reform", "SALT Reform", "Net income change after SALT Reform"),
+        ("Tip Income Exemption", "Tip Income Exempt", "Net income change after Tip Income Exempt"),
+        ("Overtime Income Exemption", "Overtime Income Exempt", "Net income change after Overtime Income Exempt"),
+        ("Auto Loan Interest Deduction", "Auto Loan Interest ALD", "Net income change after Auto Loan Interest ALD"),
+        ("Miscellaneous Reform", "Miscellaneous Reform", "Net income change after Miscellaneous Reform"),
+        ("Other Itemized Deductions Reform", "Other Itemized Deductions Reform", "Net income change after Other Itemized Deductions Reform"),
+        ("Pease Reform", "Pease Reform", "Net income change after Pease Reform")
     ]
+    
+    for display_name, col_name, income_col in reform_configs:
+        federal_tax = household[f'Federal tax liability after {col_name}'] if show_federal else 0
+        state_tax = household[f'State tax liability after {col_name}'] if show_state else 0
+        combined_tax = federal_tax + state_tax
+        income_change = household[income_col]
+        reform_components.append((display_name, combined_tax, income_change)) 
     
     # Filter out components with no change
     active_components = [(name, tax_after, income_change) for name, tax_after, income_change in reform_components if abs(income_change) > 0.01]
