@@ -52,21 +52,59 @@ def main():
         household_id = st.session_state.random_household
         st.sidebar.info(f"Random Household ID: {household_id}")
     else:
-        # Pre-filter for interesting cases
-        interesting_options = {
-            "Largest % Federal Tax Increase": df.loc[df['Percentage Change in Federal Tax Liability'].idxmax(), 'Household ID'],
-            "Largest % Federal Tax Decrease": df.loc[df['Percentage Change in Federal Tax Liability'].idxmin(), 'Household ID'],
-            "Largest Federal Tax Increase": df.loc[df['Total Change in Federal Tax Liability'].idxmax(), 'Household ID'],
-            "Largest Federal Tax Decrease": df.loc[df['Total Change in Federal Tax Liability'].idxmin(), 'Household ID'],
-            "Largest % Income Increase": df.loc[df['Percentage Change in Net Income'].idxmax(), 'Household ID'],
-            "Largest % Income Decrease": df.loc[df['Percentage Change in Net Income'].idxmin(), 'Household ID'],
-            "Largest Income Increase": df.loc[df['Total Change in Net Income'].idxmax(), 'Household ID'],
-            "Largest Income Decrease": df.loc[df['Total Change in Net Income'].idxmin(), 'Household ID'],
+        # Pre-filter for interesting cases with top 20 rankings
+        case_type = st.sidebar.selectbox("Select Case Type:", [
+            "Largest % Federal Tax Increase",
+            "Largest % Federal Tax Decrease", 
+            "Largest Federal Tax Increase",
+            "Largest Federal Tax Decrease",
+            "Largest % Income Increase",
+            "Largest % Income Decrease",
+            "Largest Income Increase",
+            "Largest Income Decrease"
+        ])
+        
+        # Get top 20 households for selected category
+        categories = {
+            "Largest % Federal Tax Increase": ('nlargest', 'Percentage Change in Federal Tax Liability'),
+            "Largest % Federal Tax Decrease": ('nsmallest', 'Percentage Change in Federal Tax Liability'),
+            "Largest Federal Tax Increase": ('nlargest', 'Total Change in Federal Tax Liability'),
+            "Largest Federal Tax Decrease": ('nsmallest', 'Total Change in Federal Tax Liability'),
+            "Largest % Income Increase": ('nlargest', 'Percentage Change in Net Income'),
+            "Largest % Income Decrease": ('nsmallest', 'Percentage Change in Net Income'),
+            "Largest Income Increase": ('nlargest', 'Total Change in Net Income'),
+            "Largest Income Decrease": ('nsmallest', 'Total Change in Net Income')
         }
         
-        case_type = st.sidebar.selectbox("Select Case Type:", list(interesting_options.keys()))
-        household_id = interesting_options[case_type]
+        method, column = categories[case_type]
+        top_households = getattr(df, method)(20, column)
+                
+        # Create ranked list for selection
+        ranked_options = []
+        for i, (idx, row) in enumerate(top_households.iterrows(), 1):
+            if "%" in case_type:
+                if "Tax" in case_type:
+                    value = row['Percentage Change in Federal Tax Liability']
+                    ranked_options.append(f"#{i}: HH {row['Household ID']} ({row['State']}) - {value:+.1f}%")
+                else:  # Income
+                    value = row['Percentage Change in Net Income']
+                    ranked_options.append(f"#{i}: HH {row['Household ID']} ({row['State']}) - {value:+.1f}%")
+            else:  # Dollar amounts
+                if "Tax" in case_type:
+                    value = row['Total Change in Federal Tax Liability']
+                    ranked_options.append(f"#{i}: HH {row['Household ID']} ({row['State']}) - ${value:+,.0f}")
+                else:  # Income
+                    value = row['Total Change in Net Income']
+                    ranked_options.append(f"#{i}: HH {row['Household ID']} ({row['State']}) - ${value:+,.0f}")
+        
+        # Let user select from ranked list
+        selected_option = st.sidebar.selectbox(f"Top 20 for {case_type}:", ranked_options)
+        
+        # Extract household ID from selection
+        household_id = int(selected_option.split("HH ")[1].split(" ")[0])
         st.sidebar.info(f"Selected Household ID: {household_id}")
+
+    
     
     # Get household data
     household = df[df['Household ID'] == household_id].iloc[0]
