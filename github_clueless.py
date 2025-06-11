@@ -400,19 +400,19 @@ def main():
 
     
     # Find the reform with the greatest absolute impact
-    if not active_components:
-        biggest_reform_text = "No single reform has a major impact."
-    else:
+    if active_components:
         biggest_impact_reform = max(active_components, key=lambda x: abs(x[2]))
         biggest_reform_name = biggest_impact_reform[0]
         biggest_reform_change = biggest_impact_reform[2]
-        biggest_reform_text = f"The biggest driver is {biggest_reform_name} (${biggest_reform_change:+,.2f})."
+        biggest_reform_text = f"The biggest change comes from the {biggest_reform_name} (${biggest_reform_change:+,.2f})."
+    else:
+        biggest_reform_text = "No single reform has a major impact."
 
     
     st.info(f"""
     **Quick Story Angle:** This {household['State']} household {impact_level} {direction} the HR1 bill, 
     with a net income change of {household['Total Change in Net Income']:,.2f} ({income_pct_change:+.1f}%). 
-    The biggest change comes from the {biggest_reform_name} ({biggest_reform_change:+,.2f}).
+    {biggest_reform_text}
     The household represents approximately {f"{math.ceil(weight):,}"} similar American families.
     """)
     
