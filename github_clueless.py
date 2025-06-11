@@ -85,6 +85,24 @@ def main():
                 df_filtered = df_filtered[df_filtered['Number of Dependents'] >= 3]
             else:
                 df_filtered = df_filtered[df_filtered['Number of Dependents'] == int(selected_dependents)]
+
+        # Filter 6: Age of Head
+        age_ranges = {
+            "All Ages": (0, 200),
+            "Under 30": (0, 30),
+            "30-40": (30, 40),
+            "40-50": (40, 50),
+            "50-60": (50, 60),
+            "60-70": (60, 70),
+            "70+": (70, 200)
+        }
+        selected_age = st.selectbox("Age of Head:", list(age_ranges.keys()))
+        min_age, max_age = age_ranges[selected_age]
+        if selected_age != "All Ages":
+            df_filtered = df_filtered[
+                (df_filtered['Age of Head'] >= min_age) & 
+                (df_filtered['Age of Head'] < max_age)
+            ]
         
         # Show filter results  
         st.caption(f"📊 Showing {len(df_filtered):,} of {len(df):,} households")  # Removed .sidebar
