@@ -384,7 +384,7 @@ def main():
         
         # Calculate baseline
         federal_baseline = household['Baseline Federal Tax Liability'] if show_federal else 0
-        state_baseline = household['Baseline State Tax Liability'] if show_state else 0
+        state_baseline = household['State Income Tax'] if show_state else 0
         baseline = federal_baseline + state_baseline
         
         # Prepare waterfall data
