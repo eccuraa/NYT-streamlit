@@ -54,10 +54,10 @@ def main():
     else:
         # Pre-filter for interesting cases
         interesting_options = {
-            "Biggest Tax Increase": df.loc[df['Total Change in Federal Tax Liability'].idxmax(), 'Household ID'],
-            "Biggest Tax Decrease": df.loc[df['Total Change in Federal Tax Liability'].idxmin(), 'Household ID'],
+            "Biggest Federal Tax Increase": df.loc[df['Total Change in Federal Tax Liability'].idxmax(), 'Household ID'],
+            "Biggest Federal Tax Decrease": df.loc[df['Total Change in Federal Tax Liability'].idxmin(), 'Household ID'],
             "Highest Income Impact": df.loc[df['Total Change in Net Income'].abs().idxmax(), 'Household ID'],
-            "Largest Percentage Change": df.loc[df['Percentage Change in Federal Tax Liability'].abs().idxmax(), 'Household ID']
+            "Largest Federal Tax Percentage Change": df.loc[df['Percentage Change in Federal Tax Liability'].abs().idxmax(), 'Household ID']
         }
         
         case_type = st.sidebar.selectbox("Select Case Type:", list(interesting_options.keys()))
@@ -204,7 +204,7 @@ def main():
         
         # Get tax liability changes (not net income changes)
         waterfall_data = []
-        waterfall_data.append(("Baseline Tax", baseline_tax, baseline_tax))
+        waterfall_data.append(("Baseline Federal & State Income Tax", baseline_tax, baseline_tax))
         
         running_total = baseline_tax
         
@@ -215,8 +215,8 @@ def main():
             waterfall_data.append((name, tax_change, running_total))
         
         # Final total
-        final_tax = baseline_tax + household['Total Change in Federal Tax Liability']
-        waterfall_data.append(("Final Tax", final_tax, final_tax))
+        final_tax = baseline_tax + household['Total Change in Federal Tax Liability'] + household['Total Change in State Tax Liability']
+        waterfall_data.append(("Final Federal & State Income Tax", final_tax, final_tax))
         
         # Create waterfall chart
         fig = go.Figure()
