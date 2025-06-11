@@ -56,10 +56,12 @@ def main():
         interesting_options = {
             "Largest % Federal Tax Increase": df.loc[df['Percentage Change in Federal Tax Liability'].idxmax(), 'Household ID'],
             "Largest % Federal Tax Decrease": df.loc[df['Percentage Change in Federal Tax Liability'].idxmin(), 'Household ID'],
+            "Largest Federal Tax Increase": df.loc[df['Total Change in Federal Tax Liability'].idxmax(), 'Household ID'],
+            "Largest Federal Tax Decrease": df.loc[df['Total Change in Federal Tax Liability'].idxmin(), 'Household ID'],
             "Largest % Income Increase": df.loc[df['Percentage Change in Net Income'].idxmax(), 'Household ID'],
             "Largest % Income Decrease": df.loc[df['Percentage Change in Net Income'].idxmin(), 'Household ID'],
-            "Biggest Income Increase": df.loc[df['Total Change in Net Income'].idxmax(), 'Household ID'],
-            "Biggest Income Decrease": df.loc[df['Total Change in Net Income'].idxmin(), 'Household ID'],
+            "Largest Income Increase": df.loc[df['Total Change in Net Income'].idxmax(), 'Household ID'],
+            "Largest Income Decrease": df.loc[df['Total Change in Net Income'].idxmin(), 'Household ID'],
         }
         
         case_type = st.sidebar.selectbox("Select Case Type:", list(interesting_options.keys()))
