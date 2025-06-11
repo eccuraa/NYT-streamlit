@@ -421,7 +421,7 @@ def main():
         
         # Update chart title
         fig.update_layout(
-            title=f"{chart_type} Liability Changes: ${baseline_total:,.0f} → ${final_total:,.0f}",
+            title=f"{chart_type} Liability Changes: ${baseline:,.0f} → ${final_total:,.0f}",
             xaxis_title="Reform Components",
             yaxis_title="Tax Liability ($)",
             showlegend=False,
