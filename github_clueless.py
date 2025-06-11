@@ -400,14 +400,15 @@ def main():
 
     
     # Find the reform with the greatest absolute impact
+    # But first define the global variables
+    biggest_reform_name = None
+    biggest_reform_change = 0
     if active_components:
         biggest_impact_reform = max(active_components, key=lambda x: abs(x[2]))
         biggest_reform_name = biggest_impact_reform[0]
         biggest_reform_change = biggest_impact_reform[2]
         biggest_reform_text = f"The biggest driver is {biggest_reform_name} (${biggest_reform_change:+,.2f})."
     else:
-        biggest_reform_name = None
-        biggest_reform_change = 0
         biggest_reform_text = "No single reform has a major impact."
 
     
