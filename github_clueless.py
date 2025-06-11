@@ -81,6 +81,8 @@ def main():
                 
         # Create ranked list for selection
         ranked_options = []
+        household_ids = []  # Keep track of household IDs separately, sorry that this is not concise
+        
         for i, (idx, row) in enumerate(top_households.iterrows(), 1):
             household_ids.append(row['Household ID'])  # Store the household ID
             
