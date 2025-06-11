@@ -172,7 +172,8 @@ def main():
         ("Exemption Reform", household['Federal tax liability after Exemption Reform'], household['Net income change after Exemption Reform']),
         ("Child Tax Credit Reform", household['Federal tax liability after CTC Reform'], household['Net income change after CTC Reform']),
         ("QBID Reform", household['Federal tax liability after QBID Reform'], household['Net income change after QBID Reform']),
-        ("Estate Tax Reform", household['Federal tax liability after Estate Tax Reform'], household['Net income change after Estate Tax Reform']),
+        # Removed Estate Tax Reform, because it doesn't directly affect Federal Income Tax, like the other reforms.
+        #("Estate Tax Reform", household['Federal tax liability after Estate Tax Reform'], household['Net income change after Estate Tax Reform']),
         ("AMT Reform", household['Federal tax liability after AMT Reform'], household['Net income change after AMT Reform']),
         ("SALT Reform", household['Federal tax liability after SALT Reform'], household['Net income change after SALT Reform']),
         ("Tip Income Exemption", household['Federal tax liability after Tip Income Exempt'], household['Net income change after Tip Income Exempt']),
