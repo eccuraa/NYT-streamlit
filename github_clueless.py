@@ -245,16 +245,6 @@ def main():
         row_index = df_filtered[df_filtered['Household ID'] == household_id].index[0]
         st.dataframe(household.to_frame().T, use_container_width=True)
 
-
-    # Implementing the Federal vs. State Tax Checkboxes
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("Show Effects for")
-    show_federal = st.sidebar.checkbox("Federal Taxes", value=True)
-    show_state = st.sidebar.checkbox("State Taxes", value=False)
-
-    if not show_federal and not show_state:
-        st.sidebar.error("Please select at least one tax type")
-        st.stop()
     
     # Display household information in cards
     col1, col2 = st.columns(2)
@@ -280,45 +270,29 @@ def main():
       
     
     with col2:
+        # Reform Impact Card
         st.subheader("🔄 HR1 Bill Impact Summary")
         with st.container():
-            # Define income variables first (these don't change based on tax selection)
+            tax_change = household['Total Change in Federal Tax Liability']
             income_change = household['Total Change in Net Income']
+            tax_pct_change = household['Percentage Change in Federal Tax Liability']
             income_pct_change = household['Percentage Change in Net Income']
             
-            # Calculate tax changes based on selection
-            federal_tax_change = household['Total Change in Federal Tax Liability'] if show_federal else 0
-            state_tax_change = household['Total Change in State Tax Liability'] if show_state else 0
-            total_tax_change = federal_tax_change + state_tax_change
-            
-            # Calculate percentage changes
-            federal_tax_pct_change = household['Percentage Change in Federal Tax Liability'] if show_federal else 0
-            state_tax_pct_change = household['Percentage Change in State Tax Liability'] if show_state else 0
-            
-            # For combined percentage, show separately when both selected
-            if show_federal and show_state:
-                tax_display = f"Federal: ${federal_tax_change:,.2f} ({federal_tax_pct_change:+.1f}%), State: ${state_tax_change:,.2f} ({state_tax_pct_change:+.1f}%)"
-            elif show_federal:
-                tax_display = f"${federal_tax_change:,.2f} ({federal_tax_pct_change:+.1f}%)"
-            else:  # show_state
-                tax_display = f"${state_tax_change:,.2f} ({state_tax_pct_change:+.1f}%)"
-            
             # Color coding for positive/negative changes
-            tax_color = "red" if total_tax_change > 0 else "green"
+            tax_color = "red" if tax_change > 0 else "green"
             income_color = "green" if income_change > 0 else "red"
             
             st.markdown(f"""
             <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
             <h4>Overall Impact</h4>
             <p style="color: {tax_color}; font-size: 18px; font-weight: bold;">
-            Tax Change: {tax_display}
+            Tax Change: ${tax_change:,.2f} ({tax_pct_change:+.1f}%)
             </p>
             <p style="color: {income_color}; font-size: 18px; font-weight: bold;">
             Net Income Change: ${income_change:,.2f} ({income_pct_change:+.1f}%)
             </p>
             </div>
             """, unsafe_allow_html=True)
-
         
         # Statistical Weight Card
         st.subheader("📈 Statistical Weight")
@@ -327,93 +301,73 @@ def main():
             st.metric("Population Weight", f"{math.ceil(weight):,}")
             st.caption("This household represents approximately this many similar households in the U.S.")
     
-    # Create reform components data based on selection
-    reform_configs = [
-        ("Tax Rate Reform", "Tax Rate Reform"),
-        ("Standard Deduction Reform", "Standard Deduction Reform"),
-        ("Exemption Reform", "Exemption Reform"),
-        ("Child Tax Credit Reform", "CTC Reform"),
-        ("QBID Reform", "QBID Reform"),
-        ("AMT Reform", "AMT Reform"),
-        ("SALT Reform", "SALT Reform"),
-        ("Tip Income Exemption", "Tip Income Exempt"),
-        ("Overtime Income Exemption", "Overtime Income Exempt"),
-        ("Auto Loan Interest Deduction", "Auto Loan Interest ALD"),
-        ("Miscellaneous Reform", "Miscellaneous Reform"),
-        ("Other Itemized Deductions Reform", "Other Itemized Deductions Reform"),
-        ("Pease Reform", "Pease Reform")
+    # Create reform components data
+    reform_components = [
+        ("Tax Rate Reform", household['Federal tax liability after Tax Rate Reform'], household['Net income change after Tax Rate Reform']),
+        ("Standard Deduction Reform", household['Federal tax liability after Standard Deduction Reform'], household['Net income change after Standard Deduction Reform']),
+        ("Exemption Reform", household['Federal tax liability after Exemption Reform'], household['Net income change after Exemption Reform']),
+        ("Child Tax Credit Reform", household['Federal tax liability after CTC Reform'], household['Net income change after CTC Reform']),
+        ("QBID Reform", household['Federal tax liability after QBID Reform'], household['Net income change after QBID Reform']),
+        # Removed Estate Tax Reform, because it doesn't directly affect Federal Income Tax, like the other reforms.
+        #("Estate Tax Reform", household['Federal tax liability after Estate Tax Reform'], household['Net income change after Estate Tax Reform']),
+        ("AMT Reform", household['Federal tax liability after AMT Reform'], household['Net income change after AMT Reform']),
+        ("SALT Reform", household['Federal tax liability after SALT Reform'], household['Net income change after SALT Reform']),
+        ("Tip Income Exemption", household['Federal tax liability after Tip Income Exempt'], household['Net income change after Tip Income Exempt']),
+        ("Overtime Income Exemption", household['Federal tax liability after Overtime Income Exempt'], household['Net income change after Overtime Income Exempt']),
+        ("Auto Loan Interest Deduction", household['Federal tax liability after Auto Loan Interest ALD'], household['Net income change after Auto Loan Interest ALD']),
+        ("Miscellaneous Reform", household['Federal tax liability after Miscellaneous Reform'], household['Net income change after Miscellaneous Reform']),
+        ("Other Itemized Deductions Reform", household['Federal tax liability after Other Itemized Deductions Reform'], household['Net income change after Other Itemized Deductions Reform']),
+        ("Pease Reform", household['Federal tax liability after Pease Reform'], household['Net income change after Pease Reform'])
     ]
     
-    reform_components = []
-    
-    for display_name, col_name in reform_configs:
-        # Add Federal component if selected
-        if show_federal:
-            federal_tax_after = household[f'Federal tax liability after {col_name}']
-            federal_baseline = household['Baseline Federal Tax Liability']
-            federal_tax_change = federal_tax_after - federal_baseline
-            reform_components.append((f"{display_name} (Federal)", federal_tax_after, federal_tax_change))
-        
-        # Add State component if selected
-        if show_state:
-            state_tax_after = household[f'State tax liability after {col_name}']
-            state_baseline = household.get('State Income Tax', 0)  # Using current state tax as baseline
-            state_tax_change = state_tax_after - state_baseline
-            reform_components.append((f"{display_name} (State)", state_tax_after, state_tax_change))
-    
     # Filter out components with no change
-    active_components = [(name, tax_after, tax_change) for name, tax_after, tax_change in reform_components if abs(tax_change) > 0.01]
+    active_components = [(name, tax_after, income_change) for name, tax_after, income_change in reform_components if abs(income_change) > 0.01]
 
     # Detailed Reform Breakdown
     st.subheader("🔍 Detailed Reform Component Analysis")
     
     if active_components:
         cols = st.columns(min(3, len(active_components)))
-        for i, (name, tax_after, tax_change) in enumerate(active_components):  # Changed from income_change to tax_change
+        for i, (name, tax_after, income_change) in enumerate(active_components):
             with cols[i % 3]:
-                # For tax liability: negative change = tax decrease (good), positive change = tax increase (bad)
-                color = "green" if tax_change < 0 else "red"  # Reversed logic for tax liability
+                color = "green" if income_change > 0 else "red"
                 st.markdown(f"""
                 <div style="padding: 8px; border-radius: 5px; background-color: #f9f9f9; margin: 5px 0;">
                 <h5>{name}</h5>
                 <p style="color: {color}; font-weight: bold;">
-                Tax Change: ${tax_change:,.2f} 
+                Net Income Change: ${income_change:,.2f} 
                 </p>
                 </div>
                 """, unsafe_allow_html=True)
-    
+                
         # Waterfall Chart
-        chart_title = []
-        if show_federal: chart_title.append("Federal")
-        if show_state: chart_title.append("State")
-        chart_type = " & ".join(chart_title) + " Tax"
+        st.subheader("📊 Financial Impact Waterfall Chart")
         
-        st.subheader(f"📊 {chart_type} Impact Waterfall Chart")
+        # Prepare data for waterfall chart
+        baseline_tax = household['Baseline Federal Tax Liability']
         
-        # Calculate baseline
-        federal_baseline = household['Baseline Federal Tax Liability'] if show_federal else 0
-        state_baseline = household.get('State Income Tax', 0) if show_state else 0
-        baseline = federal_baseline + state_baseline
+        # Get tax liability changes (not net income changes)
+        waterfall_data = []
+        waterfall_data.append(("Baseline Federal Income Tax", baseline_tax, baseline_tax))
         
-        # Prepare waterfall data - now using the tax_change directly
-        waterfall_data = [(f"Baseline {chart_type}", baseline, baseline)]
-        running_total = baseline
+        running_total = baseline_tax
         
-        for name, tax_after, tax_change in active_components:  # Now using tax_change directly
+        for name, tax_after, income_change in active_components:
+            # Calculate the tax change (negative income change = positive tax change)
+            tax_change = -income_change
             running_total += tax_change
             waterfall_data.append((name, tax_change, running_total))
         
         # Final total
-        final_total = baseline + total_tax_change
-        waterfall_data.append((f"Final {chart_type}", final_total, final_total))
-
-                
+        final_tax = baseline_tax + household['Total Change in Federal Tax Liability']
+        waterfall_data.append(("Final Federal Income Tax", final_tax, final_tax))
+        
         # Create FEDERAL INCOME TAX waterfall chart (state option still needed, etc.)
         fig = go.Figure() 
         
         # Add baseline
         fig.add_trace(go.Waterfall(
-            name=f"{chart_type} Impact",  # Dynamic name based on selection
+            name="Federal Income Tax Impact",
             orientation="v",
             measure=["absolute"] + ["relative"] * len(active_components) + ["total"],
             x=[item[0] for item in waterfall_data],
@@ -426,9 +380,8 @@ def main():
             totals={"marker":{"color":"blue"}}
         ))
         
-        # Update chart title
         fig.update_layout(
-            title=f"{chart_type} Liability Changes: ${baseline:,.0f} → ${final_total:,.0f}",
+            title=f"Federal Income Tax Liability Changes: ${baseline_tax:,.0f} → ${final_tax:,.0f}",
             xaxis_title="Reform Components",
             yaxis_title="Tax Liability ($)",
             showlegend=False,
