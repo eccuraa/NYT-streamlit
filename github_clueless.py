@@ -91,11 +91,10 @@ def main():
         if len(df_filtered) == 0:
             st.error("No households match your filters!")  # Removed .sidebar
             st.stop()
-    
-    # Add separator
-    st.sidebar.markdown("---")
-    
+
     # Use df_filtered everywhere below this point
+
+    
     selection_method = st.sidebar.radio(
         "Selection Method:",
         ["By Household ID", "Find Interesting Cases", "Random Shuffle"]
@@ -180,7 +179,7 @@ def main():
     
     
     # Get household data
-    household = df[df['Household ID'] == household_id].iloc[0]
+    household = df_filtered[df_filtered['Household ID'] == household_id].iloc[0]
 
     # Baseline Attributes in Sidebar
     st.sidebar.subheader("Baseline Household Attributes")
@@ -224,7 +223,7 @@ def main():
     # Collapsible DF row
     with st.sidebar.expander("Full Dataframe Row"):
         # Get the row index (position in the CSV)
-        row_index = df[df['Household ID'] == household_id].index[0]
+        row_index = df_filtered[df_filtered['Household ID'] == household_id].index[0]
         st.dataframe(household.to_frame().T, use_container_width=True)
 
     
