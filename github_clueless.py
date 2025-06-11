@@ -199,8 +199,8 @@ def main():
         # Waterfall Chart
         st.subheader("📊 Financial Impact Waterfall Chart")
         
-        # Prepare data for waterfall chart
-        baseline_tax = household['Baseline Federal Tax Liability']
+        # Prepare data for waterfall chart, federal and state taxes, as there are reforms for each
+        baseline_tax = household['Baseline Federal Tax Liability'] + household['State Income Tax']
         
         # Get tax liability changes (not net income changes)
         waterfall_data = []
@@ -237,9 +237,9 @@ def main():
         ))
         
         fig.update_layout(
-            title=f"Tax Liability Changes: ${baseline_tax:,.0f} → ${final_tax:,.0f}",
+            title=f"Federal and State Income Tax Liability Changes: ${baseline_tax:,.0f} → ${final_tax:,.0f}",
             xaxis_title="Reform Components",
-            yaxis_title="Tax Liability ($)",
+            yaxis_title="Income Tax Liability ($)",
             showlegend=False,
             height=500,
             xaxis={'tickangle': -45}
