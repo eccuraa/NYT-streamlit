@@ -383,12 +383,9 @@ def main():
         st.subheader(f"📊 {chart_type} Impact Waterfall Chart")
         
         # Calculate baseline
-        if show_federal & show_state:
-            baseline = household['Baseline Federal Tax Liability'] + household['Baseline State Tax Liability']
-        elif show_federal:
-            baseline = household['Baseline Federal Tax Liability']
-        elif show_state:
-            baseline = household['Baseline State Tax Liability']
+        federal_baseline = household['Baseline Federal Tax Liability'] if show_federal else 0
+        state_baseline = household['Baseline State Tax Liability'] if show_state else 0
+        baseline = federal_baseline + state_baseline
         
         # Prepare waterfall data
         waterfall_data = [(f"Baseline {chart_type}", baseline, baseline)]
