@@ -107,6 +107,8 @@ def main():
         # Get household ID using the index
         selected_index = ranked_options.index(selected_option)
         household_id = household_ids[selected_index]
+        # Show it in a card
+        st.sidebar.info(f"Selected Household ID: {household_id}")
 
     
     
