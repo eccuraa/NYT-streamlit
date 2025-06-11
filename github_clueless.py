@@ -165,9 +165,6 @@ def main():
             st.metric("Population Weight", f"{math.ceil(weight):,}")
             st.caption("This household represents approximately this many similar households in the U.S.")
     
-    # Detailed Reform Breakdown
-    st.subheader("🔍 Detailed Reform Component Analysis")
-    
     # Create reform components data
     reform_components = [
         ("Tax Rate Reform", household['Federal tax liability after Tax Rate Reform'], household['Net income change after Tax Rate Reform']),
@@ -188,6 +185,9 @@ def main():
     
     # Filter out components with no change
     active_components = [(name, tax_after, income_change) for name, tax_after, income_change in reform_components if abs(income_change) > 0.01]
+
+    # Detailed Reform Breakdown
+    st.subheader("🔍 Detailed Reform Component Analysis")
     
     if active_components:
         cols = st.columns(min(3, len(active_components)))
