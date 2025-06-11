@@ -28,14 +28,11 @@ def main():
     # Sidebar for household selection
     st.sidebar.header("Select Household")
     
-    # Filters section
-    st.sidebar.subheader("🔍 Filters")
-    
     # Initialize filtered dataframe
     df_filtered = df.copy()
 
     ### ALL FILTERS
-    with st.sidebar.expander("Full Dataframe Row"):
+    with st.sidebar.expander("🔍 Filters"):
         # Filter 1: Household Weight
         weight_options = {
             "All Households": 0,
