@@ -35,7 +35,7 @@ def main():
     df_filtered = df.copy()
 
     ### ALL FILTERS
-        with st.sidebar.expander("Full Dataframe Row"):
+    with st.sidebar.expander("Full Dataframe Row"):
         # Filter 1: Household Weight
         weight_options = {
             "All Households": 0,
