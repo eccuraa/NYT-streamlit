@@ -69,6 +69,12 @@ def main():
 
     # Baseline Attributes in Sidebar
     st.sidebar.subheader("Baseline Household Attributes")
+    # Add this after your existing Baseline Household Attributes section
+    with st.sidebar.expander("🔍 Technical Details"):
+        # Get the row index (position in the CSV)
+        row_index = df[df['Household ID'] == household_id].index[0]
+        st.write(f"**CSV Row Number:** {row_index + 1}")  # +1 because CSV rows start at 1 (including header)
+        st.write(f"**DataFrame Index:** {row_index}")     # 0-based index in the DataFrame
     st.sidebar.markdown(f"""
     **State:** {household['State']}  
     **Head of Household Age:** {household['Age of Head']:.0f} years  
