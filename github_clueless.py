@@ -106,11 +106,10 @@ def main():
             st.sidebar.markdown(f"• {source}: ${amount:,.2f}")
 
 
-    # Add this after your existing Baseline Household Attributes section
+    # Collapsible DF row
     with st.sidebar.expander("Full Dataframe Row"):
         # Get the row index (position in the CSV)
         row_index = df[df['Household ID'] == household_id].index[0]
-        st.write(f"**Dataframe Row Number:** {row_index + 1}")  # +1 because CSV rows start at 1 (including header)
         st.dataframe(household.to_frame().T, use_container_width=True)
 
     
