@@ -85,17 +85,17 @@ def main():
             if "%" in case_type:
                 if "Tax" in case_type:
                     value = row['Percentage Change in Federal Tax Liability']
-                    ranked_options.append(f"#{i}: HH {row['Household ID']} ({row['State']}) - {value:+.1f}%")
+                    ranked_options.append(f"#{i}: {value:+.1f}%")
                 else:  # Income
                     value = row['Percentage Change in Net Income']
-                    ranked_options.append(f"#{i}: HH {row['Household ID']} ({row['State']}) - {value:+.1f}%")
+                    ranked_options.append(f"#{i}: {value:+.1f}%")
             else:  # Dollar amounts
                 if "Tax" in case_type:
                     value = row['Total Change in Federal Tax Liability']
-                    ranked_options.append(f"#{i}: HH {row['Household ID']} ({row['State']}) - ${value:+,.0f}")
+                    ranked_options.append(f"#{i}: ${value:+,.0f}")
                 else:  # Income
                     value = row['Total Change in Net Income']
-                    ranked_options.append(f"#{i}: HH {row['Household ID']} ({row['State']}) - ${value:+,.0f}")
+                    ranked_options.append(f"#{i}: ${value:+,.0f}")
         
         # Let user select from ranked list
         selected_option = st.sidebar.selectbox(f"Top 20 for {case_type}:", ranked_options)
