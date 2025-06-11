@@ -245,6 +245,16 @@ def main():
         row_index = df_filtered[df_filtered['Household ID'] == household_id].index[0]
         st.dataframe(household.to_frame().T, use_container_width=True)
 
+
+    # Implementing the Federal vs. State Tax Checkboxes
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("Show Effects for")
+    show_federal = st.sidebar.checkbox("Federal Taxes", value=True)
+    show_state = st.sidebar.checkbox("State Taxes", value=False)
+
+if not show_federal and not show_state:
+    st.sidebar.error("Please select at least one tax type")
+    st.stop()
     
     # Display household information in cards
     col1, col2 = st.columns(2)
