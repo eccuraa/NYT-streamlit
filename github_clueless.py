@@ -252,9 +252,9 @@ def main():
     show_federal = st.sidebar.checkbox("Federal Taxes", value=True)
     show_state = st.sidebar.checkbox("State Taxes", value=False)
 
-if not show_federal and not show_state:
-    st.sidebar.error("Please select at least one tax type")
-    st.stop()
+    if not show_federal and not show_state:
+        st.sidebar.error("Please select at least one tax type")
+        st.stop()
     
     # Display household information in cards
     col1, col2 = st.columns(2)
