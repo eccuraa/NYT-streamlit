@@ -31,68 +31,66 @@ def main():
     # Initialize filtered dataframe
     df_filtered = df.copy()
 
-    ### ALL FILTERS
-    with st.sidebar.expander("🔍 Filters"):
-        # Filter 1: Household Weight
-        weight_options = {
-            "All Households": 0,
-            "Weight 1,000+": 1000,
-            "Weight 5,000+": 5000,
-            "Weight 10,000+": 10000,
-            "Weight 25,000+": 25000,
-            "Weight 50,000+": 50000
-        }
-        selected_weight = st.sidebar.selectbox("Minimum Household Weight:", list(weight_options.keys()))
-        min_weight = weight_options[selected_weight]
-        if min_weight > 0:
-            df_filtered = df_filtered[df_filtered['Household Weight'] >= min_weight]
-        
-        # Filter 2: Baseline Net Income
-        income_ranges = {
-            "All Income Levels": (0, float('inf')),
-            "Under $25k": (0, 25000),
-            "$25k - $50k": (25000, 50000),
-            "$50k - $100k": (50000, 100000),
-            "$100k - $200k": (100000, 200000),
-            "$200k+": (200000, float('inf'))
-        }
-        selected_income = st.sidebar.selectbox("Baseline Net Income:", list(income_ranges.keys()))
-        min_income, max_income = income_ranges[selected_income]
-        if min_income > 0 or max_income < float('inf'):
-            df_filtered = df_filtered[
-                (df_filtered['Baseline Net Income'] >= min_income) & 
-                (df_filtered['Baseline Net Income'] <= max_income)
-            ]
-        
-        # Filter 3: State
-        states = ["All States"] + sorted(df['State'].unique().tolist())
-        selected_state = st.sidebar.selectbox("State:", states)
-        if selected_state != "All States":
-            df_filtered = df_filtered[df_filtered['State'] == selected_state]
-        
-        # Filter 4: Marital Status
-        marital_options = ["All", "Married", "Single"]
-        selected_marital = st.sidebar.selectbox("Marital Status:", marital_options)
-        if selected_marital != "All":
-            is_married = selected_marital == "Married"
-            df_filtered = df_filtered[df_filtered['Is Married'] == is_married]
-        
-        # Filter 5: Number of Dependents
-        dependent_options = ["All", "0", "1", "2", "3+"]
-        selected_dependents = st.sidebar.selectbox("Number of Dependents:", dependent_options)
-        if selected_dependents != "All":
-            if selected_dependents == "3+":
-                df_filtered = df_filtered[df_filtered['Number of Dependents'] >= 3]
-            else:
-                df_filtered = df_filtered[df_filtered['Number of Dependents'] == int(selected_dependents)]
-
-        ### CAN ADD MORE FILTERS HERE
-        
-        # Show filter results
-        st.sidebar.caption(f"📊 Showing {len(df_filtered):,} of {len(df):,} households")
-        if len(df_filtered) == 0:
-            st.sidebar.error("No households match your filters!")
-            st.stop()
+### ALL FILTERS
+with st.sidebar.expander("🔍 Filters"):
+    # Filter 1: Household Weight
+    weight_options = {
+        "All Households": 0,
+        "Weight 1,000+": 1000,
+        "Weight 5,000+": 5000,
+        "Weight 10,000+": 10000,
+        "Weight 25,000+": 25000,
+        "Weight 50,000+": 50000
+    }
+    selected_weight = st.selectbox("Minimum Household Weight:", list(weight_options.keys()))  # Removed .sidebar
+    min_weight = weight_options[selected_weight]
+    if min_weight > 0:
+        df_filtered = df_filtered[df_filtered['Household Weight'] >= min_weight]
+    
+    # Filter 2: Baseline Net Income
+    income_ranges = {
+        "All Income Levels": (0, float('inf')),
+        "Under $25k": (0, 25000),
+        "$25k - $50k": (25000, 50000),
+        "$50k - $100k": (50000, 100000),
+        "$100k - $200k": (100000, 200000),
+        "$200k+": (200000, float('inf'))
+    }
+    selected_income = st.selectbox("Baseline Net Income:", list(income_ranges.keys()))  # Removed .sidebar
+    min_income, max_income = income_ranges[selected_income]
+    if min_income > 0 or max_income < float('inf'):
+        df_filtered = df_filtered[
+            (df_filtered['Baseline Net Income'] >= min_income) & 
+            (df_filtered['Baseline Net Income'] <= max_income)
+        ]
+    
+    # Filter 3: State
+    states = ["All States"] + sorted(df['State'].unique().tolist())
+    selected_state = st.selectbox("State:", states)  # Removed .sidebar
+    if selected_state != "All States":
+        df_filtered = df_filtered[df_filtered['State'] == selected_state]
+    
+    # Filter 4: Marital Status
+    marital_options = ["All", "Married", "Single"]
+    selected_marital = st.selectbox("Marital Status:", marital_options)  # Removed .sidebar
+    if selected_marital != "All":
+        is_married = selected_marital == "Married"
+        df_filtered = df_filtered[df_filtered['Is Married'] == is_married]
+    
+    # Filter 5: Number of Dependents
+    dependent_options = ["All", "0", "1", "2", "3+"]
+    selected_dependents = st.selectbox("Number of Dependents:", dependent_options)  # Removed .sidebar
+    if selected_dependents != "All":
+        if selected_dependents == "3+":
+            df_filtered = df_filtered[df_filtered['Number of Dependents'] >= 3]
+        else:
+            df_filtered = df_filtered[df_filtered['Number of Dependents'] == int(selected_dependents)]
+    
+    # Show filter results  
+    st.caption(f"📊 Showing {len(df_filtered):,} of {len(df):,} households")  # Removed .sidebar
+    if len(df_filtered) == 0:
+        st.error("No households match your filters!")  # Removed .sidebar
+        st.stop()
     
     # Add separator
     st.sidebar.markdown("---")
