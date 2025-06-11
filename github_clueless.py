@@ -94,7 +94,8 @@ def main():
             "40-50": (40, 50),
             "50-60": (50, 60),
             "60-70": (60, 70),
-            "70+": (70, 200)
+            "70-80": (70, 80),
+            "80+": (80, 200)
         }
         selected_age = st.selectbox("Age of Head:", list(age_ranges.keys()))
         min_age, max_age = age_ranges[selected_age]
